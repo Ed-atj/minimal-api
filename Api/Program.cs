@@ -1,11 +1,26 @@
-using MinimalApi;
+using MinimalApi.Endpoints;
+using MinimalApi.Extensions;
 
-IHostBuilder CreateHostBuilder(string[] args){
-  return Host.CreateDefaultBuilder(args)
-    .ConfigureWebHostDefaults(webBuilder =>
-    {
-        webBuilder.UseStartup<Startup>();
-    });
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAppServices(builder.Configuration);
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-CreateHostBuilder(args).Build().Run();
+app.UseGlobalExceptionHandler();
+app.UseHttpsRedirection();
+app.UseCors();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+
+
+app.MapVeiculoEndpoints();
+app.MapAdministradorEndpoints();
+
+app.Run();
